@@ -56,7 +56,7 @@ It outputs the daily sleep summaries, seven stage summaries, HRV arrays without 
 
 ### Preserve rolling snapshots
 
-**The current sync replaces the local `FbtBackup/lha_bkup.fit` when its source metadata changes. It does not archive old versions or merge extracted records.** The snapshot contains 100 daily records and seven detailed stage summaries; we do not know the actual retention limits or whether their indexes shift, but history could disappear as the watch updates the file. Before relying on repeated syncs, build a version archive or extract and merge records into persistent local history. This preservation is not implemented yet.
+The sync now archives old and new content versions under `coaching/raw/<sha256>.fit` before replacing changed files. `coach_context.py` also archives current files, caches decoded summaries, and merges sleep history by local wake date (current snapshots win). Earlier overwritten versions cannot be recovered. Distinct sleeps on one wake date require raw inspection. See `coaching/README.md`.
 
 Each decoded sleep record has absolute start and end timestamps. In the current snapshot, index 0 is most recent and larger indexes go backward; treat indexes as potentially shifting positions, not stable identifiers. We have not found a permanent sleep-session ID. A practical importer can match by device and sleep interval or local wake date, but must allow for revised start/end times and avoid silently merging distinct sessions. Time-zone offsets are present and can change across daylight saving time. No matching strategy has been validated against successive watch snapshots yet.
 

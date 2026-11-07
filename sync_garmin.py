@@ -15,6 +15,23 @@ import tempfile
 
 DEST = Path(__file__).resolve().parent / 'activities'
 MANIFEST = Path(__file__).resolve().parent / '.garmin-sync.json'
+ARCHIVE = Path(__file__).resolve().parent / 'coaching/raw'
+
+
+def archive_fit(path):
+    """Preserve an immutable content version before a rolling file is replaced."""
+    ARCHIVE.mkdir(parents=True, exist_ok=True)
+    raw = path.read_bytes()
+    target = ARCHIVE / (hashlib.sha256(raw).hexdigest() + '.fit')
+    if not target.exists():
+        fd, temp = tempfile.mkstemp(prefix='.archive-', dir=ARCHIVE)
+        try:
+            with os.fdopen(fd, 'wb') as f:
+                f.write(raw)
+            os.replace(temp, target)
+        finally:
+            if os.path.exists(temp):
+                os.unlink(temp)
 
 class Entry(C.Structure):
     _fields_ = [('vendor', C.c_char_p), ('vendor_id', C.c_uint16), ('product', C.c_char_p), ('product_id', C.c_uint16), ('flags', C.c_uint32)]
@@ -178,6 +195,9 @@ def sync():
                 if target.is_file() and sha256(target) == checksum:
                     skipped += 1
                 else:
+                    if target.is_file():
+                        archive_fit(target)
+                    archive_fit(downloaded)
                     os.replace(temp, target)
                     copied += 1
                     print(f'Copied {relative}', flush=True)

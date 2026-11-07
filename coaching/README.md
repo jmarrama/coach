@@ -1,0 +1,5 @@
+Daily context: `uv run --script coach_context.py` (no USB/network after dependency install). Sync first when watch attached: `uv run --script sync_garmin.py`.
+
+Human/agent memory: profile.md (facts), state.md (active plan), journal.jsonl (append-only recommendations/feedback). Generated brief.md is the single routine read. Full sessions.json/sleep.json support deeper questions. Cache/raw contain private health data; keep local. No GPS/serials in brief. Raw FIT archives retain original sensitive data.
+
+First build decodes all FITs; subsequent builds hash inputs and reuse content caches. Changed recovery snapshots merge by local wake date; current snapshot wins. Multiple sleeps per wake date and travel may need raw inspection. Archival starts now; earlier overwritten data cannot be recovered. Partial decode failures are displayed and return nonzero; do not interpret incomplete totals as full coverage. Delete cache to force decoder refresh; increment VERSION when extraction logic changes. Raw archives are preserved across sync and cache rebuilds.

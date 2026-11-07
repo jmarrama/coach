@@ -1,2 +1,8 @@
 .garmin-sync.json
 activities
+coaching/cache/
+coaching/raw/
+coaching/brief.md
+coaching/sessions.json
+coaching/sleep.json
+__pycache__/
